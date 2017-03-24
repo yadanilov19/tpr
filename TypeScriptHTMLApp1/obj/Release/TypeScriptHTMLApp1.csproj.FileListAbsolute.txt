@@ -1,0 +1,6 @@
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\TypeScriptHTMLApp1.dll.config
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\TypeScriptHTMLApp1.dll
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\TypeScriptHTMLApp1.pdb
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Release\TypeScriptHTMLApp1.csprojResolveAssemblyReference.cache
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Release\TypeScriptHTMLApp1.dll
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Release\TypeScriptHTMLApp1.pdb

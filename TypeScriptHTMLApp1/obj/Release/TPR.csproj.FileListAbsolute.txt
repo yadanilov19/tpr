@@ -1,0 +1,6 @@
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\TPR.dll.config
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\TPR.dll
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\TPR.pdb
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Release\TPR.csprojResolveAssemblyReference.cache
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Release\TPR.dll
+C:\Users\localadmin\Downloads\TypeScriptHTMLApp1 (1)\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Release\TPR.pdb
