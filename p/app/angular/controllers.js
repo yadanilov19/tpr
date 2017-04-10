@@ -11,18 +11,170 @@ function fold(arr, bufer) {
 
     return bufer;
 }
-var angular = angular.module('app', ['ng']);
-angular
+var ang = angular.module('app', ['ngRoute']);
+ang
+    .controller("mainA", function ($scope, su, $http) {
+
+        $scope.savemodal = function () {
+            $("#savemodal").modal('show');
+        }
+        $scope.saveData = function () {
+            var model = $scope.getmodel();
+            su.Save(model);
+        }
+        $scope.upload = function () {
+            var files = $("#inputUpload")[0].files;
+            if (!files || files.length === 0) {
+                alert("выберите файл перед загрузкой!");
+            } else {
+                su.upload(files);
+                $("#savemodal").modal('toggle');
+                $(".menu-btn")[0].click();
+            }
+        }
+        $(document).on('change', ':file', function () {
+            var input = $(this),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+        });
+        $(document).ready(function () {
+            $(':file').on('fileselect', function (event, numFiles, label) {
+
+                var input = $(this).parents('.input-group').find(':text'),
+                    log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                if (input.length) {
+                    input.val(log);
+                } else {
+                    if (log) alert(log);
+                }
+
+            });
+        });
+    })
+    .service("su", function ($http, $compile, $route) {
+        this.loadCompl = true;
+        this.data = null;
+        this.rerender = function () {
+            //var content = angular.element('#content');
+            //var scope = content.scope();
+            //$compile(content.contents())(scope);
+            $route.reload();
+        }
+        this.Save = function (storageObj) {
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storageObj, function (key, value) {
+                if (key === "$$hashKey") {
+                    return undefined;
+                }
+
+                return value;
+            }));
+            var dlAnchorElem = document.getElementById('downloadAnchorElem');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "scene.json");
+            dlAnchorElem.click();
+            dlAnchorElem.removeAttribute("href");
+            dlAnchorElem.removeAttribute("download");
+        }
+        this.upload = function (files) {
+            this.loadCompl = false;
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    //var data = new FormData();
+                    //for (var x = 0; x < files.length; x++) {
+                    //    data.append("file" + x, files[x]);
+                    //}
+                    //$http.post('/Index/Upload', data).then(
+                    //   function (r) {
+                    //    this.loadCompl = true;
+                    //    $(document).trigger('loadComplete', r.data)
+                    //}, function (xhr, status, p3) {
+                    //    this.loadCompl = true;
+                    //    alert(xhr.responseText);
+                    //});
+                    //var file = files[0];
+                    //file.name = "file";
+                    //$.ajax({
+                    //    type: "POST",
+                    //    url: '/Index/Upload',
+                    //    contentType: false,
+                    //    processData: false,
+                    //    data: data,
+                    //    success: function (r) {
+                    //        this.loadCompl = true;
+                    //        $(document).trigger('loadComplete', r.data)
+                    //    },
+                    //    error: function (xhr, status, p3) {
+                    //        this.loadCompl = true;
+                    //        alert(xhr.responseText);
+                    //    }
+                    //});
+
+                    var reader = new FileReader();
+                    reader.onload = (function (files) {
+                        return function (e) {
+                            $(document).trigger('loadComplete', JSON.parse(e.target.result))
+                        };
+                    })(files[0]);
+                    reader.readAsText(files[0]);
+                } else {
+                    alert("Браузер не поддерживает загрузку файлов HTML5!");
+                }
+            }
+        }
+    })
     .controller('main',
-        function ($scope) {
+        function ($scope, su) {
+
+            $scope.getmodel = function () {
+                return {
+                    countStates: $scope.countStates,
+                    countStrategis: $scope.countStrategis,
+                    countModeling: $scope.countModeling,
+                    buttonStartHidden: $scope.buttonStartHidden,
+                    evaluateComplete: $scope.evaluateComplete,
+                    namesStates: $scope.namesStates,
+                    namesCapital: $scope.namesCapital,
+                    inputMatrix: $scope.inputMatrix,
+                    inputMatrixD: $scope.inputMatrixD,
+                    outputMatrix: $scope.outputMatrix,
+                    cy: $scope.cy
+                }
+            }
+
+            $scope.setmodel = function (d) {
+                $scope.countStates = d.countStates;
+                $scope.countStrategis = d.countStrategis;
+                $scope.countModeling = d.countModeling;
+
+                $scope.buttonStartHidden = d.buttonStartHidden;
+                $scope.evaluateComplete = d.evaluateComplete;
+                $scope.namesStates = d.namesStates;
+                $scope.namesCapital = d.namesCapital;
+                $scope.inputMatrix = d.inputMatrix;
+                $scope.inputMatrixD = d.inputMatrixD;
+                $scope.outputMatrix = d.outputMatrix;
+                $scope.cy = d.cy;
+            }
+
             $scope.countStates = 2;
             $scope.countStrategis = 3;
             $scope.countModeling = 10;
 
             function hiddenButton(n, old) {
-                if (n !== old)
-                    $scope.buttonStartHidden = false;
+                //if (n !== old)
+                    //$scope.buttonStartHidden = false;
             };
+
+            $(document).on('loadComplete', function (event, data) {
+                cleanUp();
+                su.rerender();
+
+                $scope.setmodel(data);
+                $scope.startEvaluate();
+                //su.rerender();
+            })
 
             $scope.$watch('countStates', hiddenButton);
             $scope.$watch('countStrategis', hiddenButton);
@@ -149,10 +301,12 @@ angular
                     alert('Заполните все поля!');
                     return;
                 }
+                if ($scope.countStates > 10 || $scope.countStrategis >= 10 || $scope.countModeling >= 20) {
+                    alert('Недопустимые значения в полях ввода (смотри описание ошибок в руководстве пользователя)');
+                    return;
+                }
                 cleanUp();
 
-                //$scope.inputMatrix = [[[{ "value": 0.3 }, { "value": 0.7 }], [{ "value": 0.2 }, { "value": 0.8 }]], [[{ "value": 1 }, { "value": 0 }], [{ "value": 1 }, { "value": 0 }]], [[{ "value": 0.2 }, { "value": 0.8 }], [{ "value": 0.1 }, { "value": 0.9 }]]];
-                //$scope.inputMatrixD = [[[{ "value": 2332 }, { "value": 32023 }], [{ "value": 2032 }, { "value": 3 }]], [[{ "value": 2 }, { "value": 3 }], [{ "value": 5 }, { "value": 65 }]], [[{ "value": 65 }, { "value": 465 }], [{ "value": 4 }, { "value": 654 }]]];
 
                 for (var l = 0; l < $scope.countStates; l++) {
                     $scope.namesStates.push({ name: "p" + l });
@@ -187,11 +341,28 @@ angular
             $scope.startEvaluate();
         })
     .controller('LVM',
-        function ($scope) {
+        function ($scope, su) {
             $scope.typeShape = "state";
             $scope.var = 0;
             $scope.label = '';
             $scope.callBack = null;
+            var network = null;
+            var data = [];
+
+            $scope.getmodel = function () {
+                return {
+                    edges: objectToArray(network.body.data.edges._data),
+                    nodes: objectToArray(network.body.data.nodes._data)
+                };
+            }
+
+
+            $(document).on('loadComplete', function (event, _data) {
+                clear();
+                data = _data;
+                init();
+
+            })
 
             function clear() {
                 $scope.typeShape = "state";
@@ -201,7 +372,7 @@ angular
                 $scope.data = null;
             }
 
-            $scope.update = function() {
+            $scope.update = function () {
                 var data = $scope.data;
 
                 $scope.label = data.label;
@@ -320,7 +491,7 @@ angular
                 var data = $scope.data;
                 switch ($scope.typeShape) {
                     case "state":
-                        data = merge({}, data, {
+                        data = angular.merge({}, data, {
                             label: $scope.var > 0 ? $scope.data.label + " : " + $scope.var : $scope.data.label,
                             title: $scope.var > 0 ? "Вероятность возникновения : " + $scope.var : "Промежуточная вершина",
                             shape: 'box',
@@ -336,7 +507,7 @@ angular
                         });
                         break;
                     case "or":
-                        data = merge({}, data, {
+                        data = angular.merge({}, data, {
                             label: 'ИЛИ',
                             title: 'Логическое ИЛИ',
                             shape: 'cicle',
@@ -353,7 +524,7 @@ angular
                         });
                         break;
                     case "and":
-                        data = merge({}, data, {
+                        data = angular.merge({}, data, {
                             label: 'И',
                             title: 'логическое И',
                             shape: 'cicle',
@@ -375,8 +546,6 @@ angular
                 $("#myModal").modal('hide');
             };
 
-            var network = null;
-            var data = [];
             $scope.startEvaluate = function () {
                 var nodes = network.body.data.nodes,
                     edges = network.body.data.edges;
@@ -488,4 +657,9 @@ angular
             }
 
             window.onload = init;
+
+            function objectToArray(obj) {
+                return Object.keys(obj).map(function (key) { return obj[key]; });
+            }
+
         });
